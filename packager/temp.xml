@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE isopackager SYSTEM "genericpackager.dtd">
+<isopackager>
+    <isofield class="org.jpos.iso.IFA_NUMERIC" id="0" length="4" name="MESSAGE TYPE INDICATOR"/>
+    <isofield class="org.jpos.iso.IFA_BITMAP" id="1" length="16" name="BIT MAP"/>
+    <isofield class="org.jpos.iso.IFA_LLNUM" id="2" length="19" name="SECRET ID"/>
+    <isofield class="org.jpos.iso.IFA_NUMERIC" id="3" length="6" name="PROCESSING CODE"/>
+    <isofield class="org.jpos.iso.IFA_NUMERIC" id="4" length="12" name="AMOUNT, TRANSACTION"/>
+    <isofield class="org.jpos.iso.IFA_NUMERIC" id="11" length="6" name="SYSTEM TRACE AUDIT NUMBER"/>
+    <isofield class="org.jpos.iso.IFA_NUMERIC" id="22" length="4" name="POINT OF SERVICE ENTRY MODE"/>
+    <isofield class="org.jpos.iso.IFA_NUMERIC" id="24" length="4" name="NETWORK INTERNATIONAL IDENTIFIEER"/>
+    <isofield class="org.jpos.iso.IFA_NUMERIC" id="25" length="2" name="POINT OF SERVICE CONDITION CODE"/>
+    <isofield class="org.jpos.iso.IFA_LLNUM" id="35" length="38" name="TRACK 2 DATA"/>
+    <isofield class="org.jpos.iso.IF_CHAR" id="41" length="17" name="CARD ACCEPTOR TERMINAL IDENTIFICACION"/>
+    <isofield class="org.jpos.iso.IF_CHAR" id="42" length="30" name="CARD ACCEPTOR IDENTIFICATION CODE"/>
+    <isofield class="org.jpos.iso.IF_CHAR" id="62" length="15" name="RESERVED PRIVATE"/>
+</isopackager>
