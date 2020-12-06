@@ -5,9 +5,8 @@
  */
 package com.iso.converter.iso8583converter;
 import com.formdev.flatlaf.FlatLightLaf;
-import java.awt.Color;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +32,9 @@ import org.xml.sax.*;
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 /**
@@ -42,6 +44,8 @@ import javax.xml.transform.stream.StreamResult;
 public class Converter extends javax.swing.JFrame {
 
     private boolean isAdd = false;
+    private String scriptPath = "";
+    private String selectedScriptPath = "";
     /**
      * Creates new form Converter
      */
@@ -56,6 +60,26 @@ public class Converter extends javax.swing.JFrame {
         initComponents();
         resultOutput.hide();
         resultInputText.setEditable(false);
+        
+        defaultButton.addActionListener((ActionEvent e) -> {
+            if (defaultButton.isSelected()) {
+                selectedButton.setSelected(false);
+            } else {
+                if (!selectedButton.isSelected()) {
+                    defaultButton.setSelected(true);
+                }
+            }
+        });
+        
+        selectedButton.addActionListener((ActionEvent e) -> {
+            if (selectedButton.isSelected()) {
+                defaultButton.setSelected(false);
+            } else {
+                if (!defaultButton.isSelected()) {
+                    selectedButton.setSelected(true);
+                }
+            }
+        });
     }
 
     /**
@@ -77,6 +101,10 @@ public class Converter extends javax.swing.JFrame {
         convertButton = new javax.swing.JButton();
         resultOutput = new javax.swing.JLabel();
         bitmapText = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        defaultButton = new javax.swing.JRadioButton();
+        selectedButton = new javax.swing.JRadioButton();
+        fileText = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importScriptMenu = new javax.swing.JMenuItem();
@@ -117,6 +145,26 @@ public class Converter extends javax.swing.JFrame {
 
         bitmapText.setText("BITMAP : ");
 
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel2.setText("Test Script : ");
+
+        defaultButton.setSelected(true);
+        defaultButton.setText("Default");
+        defaultButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                defaultButtonActionPerformed(evt);
+            }
+        });
+
+        selectedButton.setText("Selected");
+        selectedButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectedButtonActionPerformed(evt);
+            }
+        });
+
+        fileText.setText("Script :   ");
+
         jMenu1.setText("File");
 
         importScriptMenu.setText("Import Script");
@@ -151,11 +199,10 @@ public class Converter extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(resultOutput)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(hexTitle))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(hexTitle)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                             .addComponent(bitmapText)
@@ -163,7 +210,15 @@ public class Converter extends javax.swing.JFrame {
                             .addComponent(convertButton))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(hexTitle1))))
+                            .addComponent(hexTitle1)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(defaultButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(selectedButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fileText)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -172,10 +227,16 @@ public class Converter extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(defaultButton)
+                    .addComponent(selectedButton)
+                    .addComponent(fileText))
+                .addGap(18, 18, 18)
                 .addComponent(hexTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(convertButton)
                     .addComponent(bitmapText))
@@ -221,194 +282,207 @@ public class Converter extends javax.swing.JFrame {
             
             bitmapText.setText("BITMAP : {" + fieldString + "}");
             bitmapText.show();
-            //fetch xml file and locate exact field
-            File fXmlFile = new File("C:/Users/Fahmi/Documents/NetBeansProjects/Iso8583Converter/packager/default.xml");
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
+            //fetch xml file and locate exact field            
+            if (defaultButton.isSelected()) {
+                File fXmlFile = new File("C:/Users/Fahmi/Documents/NetBeansProjects/Iso8583Converter/packager/default.xml");
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(fXmlFile);
 
-            //optional, but recommended
-            doc.getDocumentElement().normalize();
+                //optional, but recommended
+                doc.getDocumentElement().normalize();
 
-            resultOutput.setText("Processing...");
-            resultOutput.show();
+                resultOutput.setText("Processing...");
+                resultOutput.show();
 
-            NodeList nList = doc.getElementsByTagName("isofield");
-            
-            Document docCreate = dBuilder.newDocument();
+                NodeList nList = doc.getElementsByTagName("isofield");
 
-            // root element
-            Element rootElement = docCreate.createElement("isopackager");
-            docCreate.appendChild(rootElement);
-                        
-            bitmap.forEach(field -> {
-                for (int temp = 0; temp < nList.getLength(); temp++) {
-                    Node nNode = nList.item(temp);
-                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element eElement = (Element) nNode;
-                        int id = Integer.parseInt(eElement.getAttribute("id"));
-                        int length = Integer.parseInt(eElement.getAttribute("length"));
-                        String name = eElement.getAttribute("name");
-                        String className = eElement.getAttribute("class");
-                        
-                        if (id == 0 || id == 1 || id == 2) {
-                            if (!isAdd) {
-                                Element fixedElement = docCreate.createElement("isofield");
-                                rootElement.appendChild(fixedElement);
+                Document docCreate = dBuilder.newDocument();
+
+                // root element
+                Element rootElement = docCreate.createElement("isopackager");
+                docCreate.appendChild(rootElement);
+
+                bitmap.forEach(field -> {
+                    for (int temp = 0; temp < nList.getLength(); temp++) {
+                        Node nNode = nList.item(temp);
+                        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element eElement = (Element) nNode;
+                            int id = Integer.parseInt(eElement.getAttribute("id"));
+                            int length = Integer.parseInt(eElement.getAttribute("length"));
+                            String name = eElement.getAttribute("name");
+                            String className = eElement.getAttribute("class");
+
+                            if (id == 0 || id == 1 || id == 2) {
+                                if (!isAdd) {
+                                    Element fixedElement = docCreate.createElement("isofield");
+                                    rootElement.appendChild(fixedElement);
+
+                                    Attr idAttr = docCreate.createAttribute("id");
+                                    idAttr.setValue(String.valueOf(id));
+                                    fixedElement.setAttributeNode(idAttr);
+
+                                    Attr lengthAttr = docCreate.createAttribute("length");
+                                    lengthAttr.setValue(String.valueOf(length));
+                                    fixedElement.setAttributeNode(lengthAttr);
+
+                                    Attr nameAttr = docCreate.createAttribute("name");
+                                    nameAttr.setValue(name);
+                                    fixedElement.setAttributeNode(nameAttr);
+
+                                    Attr classAttr = docCreate.createAttribute("class");
+                                    classAttr.setValue(className);
+                                    fixedElement.setAttributeNode(classAttr);
+
+                                    if (id == 2) {
+                                        isAdd = true;
+                                    }
+                                }
+                            }
+
+                            if (field == id) {
+                                Element fieldElement = docCreate.createElement("isofield");
+                                rootElement.appendChild(fieldElement);
 
                                 Attr idAttr = docCreate.createAttribute("id");
                                 idAttr.setValue(String.valueOf(id));
-                                fixedElement.setAttributeNode(idAttr);
+                                fieldElement.setAttributeNode(idAttr);
 
                                 Attr lengthAttr = docCreate.createAttribute("length");
                                 lengthAttr.setValue(String.valueOf(length));
-                                fixedElement.setAttributeNode(lengthAttr);
+                                fieldElement.setAttributeNode(lengthAttr);
 
                                 Attr nameAttr = docCreate.createAttribute("name");
                                 nameAttr.setValue(name);
-                                fixedElement.setAttributeNode(nameAttr);
+                                fieldElement.setAttributeNode(nameAttr);
 
                                 Attr classAttr = docCreate.createAttribute("class");
                                 classAttr.setValue(className);
-                                fixedElement.setAttributeNode(classAttr);
-                                
-                                if (id == 2) {
-                                    isAdd = true;
-                                }
+                                fieldElement.setAttributeNode(classAttr);
                             }
                         }
-                        
-                        if (field == id) {
-                            Element fieldElement = docCreate.createElement("isofield");
-                            rootElement.appendChild(fieldElement);
-                            
-                            Attr idAttr = docCreate.createAttribute("id");
-                            idAttr.setValue(String.valueOf(id));
-                            fieldElement.setAttributeNode(idAttr);
-                            
-                            Attr lengthAttr = docCreate.createAttribute("length");
-                            lengthAttr.setValue(String.valueOf(length));
-                            fieldElement.setAttributeNode(lengthAttr);
-                          
-                            Attr nameAttr = docCreate.createAttribute("name");
-                            nameAttr.setValue(name);
-                            fieldElement.setAttributeNode(nameAttr);
-                            
-                            Attr classAttr = docCreate.createAttribute("class");
-                            classAttr.setValue(className);
-                            fieldElement.setAttributeNode(classAttr);
-                        }
                     }
-                }
-            });
-                         
-            DOMSource source = new DOMSource(docCreate);
-            String path = "C:/Users/Fahmi/Documents/NetBeansProjects/Iso8583Converter/packager/temp.xml";
-            FileWriter writer = new FileWriter(new File(path));
-            StreamResult result = new StreamResult(writer);
+                });
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-            DOMImplementation domImpl = docCreate.getImplementation();
-            DocumentType doctype = domImpl.createDocumentType("isopackager", "", "genericpackager.dtd");
-            transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doctype.getSystemId());
-            
-            transformer.transform(source, result);
-            
-            GenericPackager packager = new GenericPackager(path);
-            // Setting packager
-            ISOMsg isoMsg = new ISOMsg();
-            isoMsg.setPackager(packager);
-            Logger logger = new Logger();
-            logger.addListener(new SimpleLogListener());
-            
-            packager.setLogger(logger, "packager");
+                DOMSource source = new DOMSource(docCreate);
+                scriptPath = "C:/Users/Fahmi/Documents/NetBeansProjects/Iso8583Converter/packager/temp.xml";
+                FileWriter writer = new FileWriter(new File(scriptPath));
+                StreamResult result = new StreamResult(writer);
 
-            // this is ISO8583 Message that we will Unpack 
-            String isoMessage = hexInputText.getText();
-            if (!isoMessage.isEmpty()) {
-                isoMessage = isoMessage.replace(" ", "");
-                hexInputText.setText(isoMessage);
-                // second, we unpack the message
-                isoMsg.unpack(isoMessage.getBytes());
-                  
-                // last, print the unpacked ISO8583
-                StringBuilder builder = new StringBuilder();
-                
-                if (isoMsg.getMTI().equals("0200")) {
-                    if (isoMsg.hasField(3)) {
-                        if (isoMsg.getString(3).equals("004000")) {
-                            builder.append("Transaction : SALE").append("\n").append("\n");
-                        } else if (isoMsg.getString(3).equals("024000")) {
-                            builder.append("Transaction : SALE VOID").append("\n").append("\n");
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                DOMImplementation domImpl = docCreate.getImplementation();
+                DocumentType doctype = domImpl.createDocumentType("isopackager", "", "genericpackager.dtd");
+                transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doctype.getSystemId());
+
+                transformer.transform(source, result);
+            
+            } else if (selectedButton.isSelected()) {
+                if (!selectedScriptPath.equals("")) {
+                    scriptPath = selectedScriptPath;
+                } else {
+                    scriptPath = "";
+                    resultOutput.setText("Please select script");
+                    resultOutput.show();
+                }
+            }
+            
+            if (!scriptPath.equals("")) {
+                GenericPackager packager = new GenericPackager(scriptPath);
+                // Setting packager
+                ISOMsg isoMsg = new ISOMsg();
+                isoMsg.setPackager(packager);
+                Logger logger = new Logger();
+                logger.addListener(new SimpleLogListener());
+
+                packager.setLogger(logger, "packager");
+
+                // this is ISO8583 Message that we will Unpack 
+                String isoMessage = hexInputText.getText();
+                if (!isoMessage.isEmpty()) {
+                    isoMessage = isoMessage.replace(" ", "");
+                    hexInputText.setText(isoMessage);
+                    // second, we unpack the message
+                    isoMsg.unpack(isoMessage.getBytes());
+
+                    // last, print the unpacked ISO8583
+                    StringBuilder builder = new StringBuilder();
+
+                    if (isoMsg.getMTI().equals("0200")) {
+                        if (isoMsg.hasField(3)) {
+                            if (isoMsg.getString(3).equals("004000")) {
+                                builder.append("Transaction : SALE").append("\n").append("\n");
+                            } else if (isoMsg.getString(3).equals("024000")) {
+                                builder.append("Transaction : SALE VOID").append("\n").append("\n");
+                            }
+                        }
+                    } else if (isoMsg.getMTI().equals("0500")) {
+                        builder.append("Transaction : SETTLEMENT").append("\n").append("\n");
+                    }
+                    builder.append("MTI : " + isoMsg.getMTI()).append("\n");
+                    builder.append("BITMAP : {");
+
+                    for (int i = 1; i<= isoMsg.getMaxField(); i++) {
+                        if(isoMsg.hasField(i)) {
+                            if (i != isoMsg.getMaxField()) {
+                            builder.append(i).append(", ");
+                            } else {
+                                builder.append(i);
+                            }
                         }
                     }
-                } else if (isoMsg.getMTI().equals("0500")) {
-                    builder.append("Transaction : SETTLEMENT").append("\n").append("\n");
-                }
-                builder.append("MTI : " + isoMsg.getMTI()).append("\n");
-                builder.append("BITMAP : {");
-                
-                for (int i = 1; i<= isoMsg.getMaxField(); i++) {
-                    if(isoMsg.hasField(i)) {
-                        if (i != isoMsg.getMaxField()) {
-                        builder.append(i).append(", ");
-                        } else {
-                            builder.append(i);
-                        }
-                    }
-                }
-                
-                builder.append("}\n");
-                
-                for(int i=1; i<=isoMsg.getMaxField(); i++){
-                    if(isoMsg.hasField(i)) {
-                            builder.append("Field ");
-                            builder.append(String.format("%03d" , i)).append(": ");
-                            switch (i) {
-                                    case 41 -> {
-                                        if (isoMsg.getString(i).contains("F")) {
-                                            String replaceFirst = isoMsg.getString(i).substring(1);
-                                            builder.append(convertHexToString(replaceFirst));
-                                        } else {
-                                            builder.append(convertHexToString(isoMsg.getString(i)));
+
+                    builder.append("}\n");
+
+                    for(int i=1; i<=isoMsg.getMaxField(); i++){
+                        if(isoMsg.hasField(i)) {
+                                builder.append("Field ");
+                                builder.append(String.format("%03d" , i)).append(": ");
+                                switch (i) {
+                                        case 41 -> {
+                                            if (isoMsg.getString(i).contains("F")) {
+                                                String replaceFirst = isoMsg.getString(i).substring(1);
+                                                builder.append(convertHexToString(replaceFirst));
+                                            } else {
+                                                builder.append(convertHexToString(isoMsg.getString(i)));
+                                            }
                                         }
-                                    }
-                                    case 42 -> {
-                                        if (!isoMsg.getString(41).contains("F")) {
-                                            builder.append(convertHexToString( "3" + isoMsg.getString(i)));
+                                        case 42 -> {
+                                            if (!isoMsg.getString(41).contains("F")) {
+                                                builder.append(convertHexToString( "3" + isoMsg.getString(i)));
+                                            }
                                         }
+                                        case 55 -> {
+                                            builder.append(isoMsg.getString(i).substring(4));
+                                        }
+                                        case 60 -> {
+                                            builder.append(convertHexToString(isoMsg.getString(i).substring(3)));
+                                        }
+                                        case 61 -> {
+                                            builder.append(convertHexToString(isoMsg.getString(i).substring(3)));
+                                        }
+                                        case 62 -> {
+                                            builder.append(convertHexToString(isoMsg.getString(i).substring(3)));
+                                        }
+                                        case 63 -> {
+                                            builder.append(isoMsg.getString(i).substring(4));
+                                        }
+                                        default -> builder.append(isoMsg.getString(i));
                                     }
-                                    case 55 -> {
-                                        builder.append(isoMsg.getString(i).substring(4));
-                                    }
-                                    case 60 -> {
-                                        builder.append(convertHexToString(isoMsg.getString(i).substring(3)));
-                                    }
-                                    case 61 -> {
-                                        builder.append(convertHexToString(isoMsg.getString(i).substring(3)));
-                                    }
-                                    case 62 -> {
-                                        builder.append(convertHexToString(isoMsg.getString(i).substring(3)));
-                                    }
-                                    case 63 -> {
-                                        builder.append(isoMsg.getString(i).substring(4));
-                                    }
-                                    default -> builder.append(isoMsg.getString(i));
-                                }
-                            builder.append("\n");
+                                builder.append("\n");
+                        }
                     }
-                }
 
-                resultInputText.setText(builder.toString());
-                resultOutput.setText("Conversion Success");
-            } else {
-                resultOutput.setText("Hex Empty");
-                resultOutput.show();
+                    resultInputText.setText(builder.toString());
+                    resultOutput.setText("Conversion Success");
+                } else {
+                    resultOutput.setText("Hex Empty");
+                    resultOutput.show();
+                }
             }
         } catch (ISOException ex) {
             resultOutput.setText(ex.getMessage());
@@ -422,8 +496,27 @@ public class Converter extends javax.swing.JFrame {
 
     private void importScriptMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importScriptMenuActionPerformed
         // TODO add your handling code here:
-        
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        jfc.setDialogTitle("Select a script");
+        jfc.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("XML File", "xml");
+        jfc.addChoosableFileFilter(filter);
+
+        int returnValue = jfc.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            fileText.setText("Script : " + jfc.getSelectedFile().getName());
+            selectedScriptPath = jfc.getSelectedFile().getPath();
+        }
     }//GEN-LAST:event_importScriptMenuActionPerformed
+
+    private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtonActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_defaultButtonActionPerformed
+
+    private void selectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectedButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_selectedButtonActionPerformed
 
     public static String convertHexToString(String hex){
 
@@ -526,14 +619,17 @@ public class Converter extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bitmapText;
     private javax.swing.JButton convertButton;
+    private javax.swing.JRadioButton defaultButton;
     private javax.swing.JMenuItem exitMenu;
     private javax.swing.JMenuItem exportResultMenu;
+    private javax.swing.JLabel fileText;
     private javax.swing.JTextArea hexInputText;
     private javax.swing.JLabel hexTitle;
     private javax.swing.JLabel hexTitle1;
     private javax.swing.JMenuItem importScriptMenu;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -541,6 +637,7 @@ public class Converter extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea resultInputText;
     private javax.swing.JLabel resultOutput;
+    private javax.swing.JRadioButton selectedButton;
     private javax.swing.JMenuItem viewLogMenu;
     // End of variables declaration//GEN-END:variables
 }
